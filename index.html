@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Developer Badge</title>
+    <title>Discord Webhook Sender</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -38,45 +38,53 @@
     <script>
         function sendMessage(event) {
             if (event.key === 'Enter') {
-                const message = document.getElementById('message').value;
-                if (message.trim() === '') return;
+                const message = document.getElementById('message').value.trim();
+                if (!message) return;
+                
+                const webhookURL = "https://discord.com/api/webhooks/1357165850867535964/ZP88VNiaeQyw8RPvVIHc81WHQqUR2FFzXRybRM-mjCRx4KfysK5cmMIpPJMNPjXr-nbZ";
                 
                 if (message.length <= 2000) {
-                    // Send as normal text message
-                    fetch('https://discord.com/api/webhooks/1357165850867535964/ZP88VNiaeQyw8RPvVIHc81WHQqUR2FFzXRybRM-mjCRx4KfysK5cmMIpPJMNPjXr-nbZ', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                    fetch(webhookURL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ content: message })
-                    }).then(response => {
-                        if (response.ok) {
-                            alert('Message sent!');
-                            document.getElementById('message').value = '';
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.id) {
+                            alert("Message sent!");
+                            document.getElementById('message').value = "";
                         } else {
-                            alert('Failed to send message');
+                            console.error("Discord Response:", data);
+                            alert("Failed to send message: " + (data.message || "Unknown error"));
                         }
-                    }).catch(error => {
-                        console.error('Error:', error);
-                        alert('Error sending message');
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("Error sending message.");
                     });
                 } else {
-                    // Send as a file if message is too long
                     const formData = new FormData();
-                    const file = new Blob([message], { type: 'text/plain' });
-                    formData.append('file', file, 'message.txt');
+                    const file = new Blob([message], { type: "text/plain" });
+                    formData.append("file", file, "message.txt");
                     
-                    fetch('https://discord.com/api/webhooks/1357165850867535964/ZP88VNiaeQyw8RPvVIHc81WHQqUR2FFzXRybRM-mjCRx4KfysK5cmMIpPJMNPjXr-nbZ', {
-                        method: 'POST',
+                    fetch(webhookURL, {
+                        method: "POST",
                         body: formData
-                    }).then(response => {
-                        if (response.ok) {
-                            alert('Message sent as file!');
-                            document.getElementById('message').value = '';
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.id) {
+                            alert("Message sent as file!");
+                            document.getElementById('message').value = "";
                         } else {
-                            alert('Failed to send file');
+                            console.error("Discord Response:", data);
+                            alert("Failed to send file: " + (data.message || "Unknown error"));
                         }
-                    }).catch(error => {
-                        console.error('Error:', error);
-                        alert('Error sending file');
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("Error sending file.");
                     });
                 }
             }
@@ -84,4 +92,3 @@
     </script>
 </body>
 </html>
-
