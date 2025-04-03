@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Webhook Sender</title>
+    <title>Developer Badge</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -41,23 +41,47 @@
                 const message = document.getElementById('message').value;
                 if (message.trim() === '') return;
                 
-                fetch('https://discord.com/api/webhooks/1357165850867535964/ZP88VNiaeQyw8RPvVIHc81WHQqUR2FFzXRybRM-mjCRx4KfysK5cmMIpPJMNPjXr-nbZ', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: message })
-                }).then(response => {
-                    if (response.ok) {
-                        alert('Message sent!');
-                        document.getElementById('message').value = '';
-                    } else {
-                        alert('Failed to send message');
-                    }
-                }).catch(error => {
-                    console.error('Error:', error);
-                    alert('Error sending message');
-                });
+                if (message.length <= 2000) {
+                    // Send as normal text message
+                    fetch('https://discord.com/api/webhooks/1357165850867535964/ZP88VNiaeQyw8RPvVIHc81WHQqUR2FFzXRybRM-mjCRx4KfysK5cmMIpPJMNPjXr-nbZ', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ content: message })
+                    }).then(response => {
+                        if (response.ok) {
+                            alert('Message sent!');
+                            document.getElementById('message').value = '';
+                        } else {
+                            alert('Failed to send message');
+                        }
+                    }).catch(error => {
+                        console.error('Error:', error);
+                        alert('Error sending message');
+                    });
+                } else {
+                    // Send as a file if message is too long
+                    const formData = new FormData();
+                    const file = new Blob([message], { type: 'text/plain' });
+                    formData.append('file', file, 'message.txt');
+                    
+                    fetch('https://discord.com/api/webhooks/1357165850867535964/ZP88VNiaeQyw8RPvVIHc81WHQqUR2FFzXRybRM-mjCRx4KfysK5cmMIpPJMNPjXr-nbZ', {
+                        method: 'POST',
+                        body: formData
+                    }).then(response => {
+                        if (response.ok) {
+                            alert('Message sent as file!');
+                            document.getElementById('message').value = '';
+                        } else {
+                            alert('Failed to send file');
+                        }
+                    }).catch(error => {
+                        console.error('Error:', error);
+                        alert('Error sending file');
+                    });
+                }
             }
         }
     </script>
 </body>
 </html>
+
